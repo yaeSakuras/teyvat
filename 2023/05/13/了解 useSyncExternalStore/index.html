@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="useSyncExternalStore 是一个 React hook，可以让你订阅一个外部存储。 引用useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?) 调用组件顶层的 useSyncExternalStore 从外部数据存储读取值。 1234567import &amp;#123; useSyncExternalStore">
+<meta property="og:type" content="article">
+<meta property="og:title" content="了解 useSyncExternalStore">
+<meta property="og:url" content="https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/index.html">
+<meta property="og:site_name" content="Teyvat">
+<meta property="og:description" content="useSyncExternalStore 是一个 React hook，可以让你订阅一个外部存储。 引用useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?) 调用组件顶层的 useSyncExternalStore 从外部数据存储读取值。 1234567import &amp;#123; useSyncExternalStore">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-05-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-05-13T16:00:00.000Z">
+<meta property="article:author" content="grafield">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>了解 useSyncExternalStore</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/05/27/Nextjs%20%E4%B8%AD%E9%A1%B9%E7%9B%AE%E7%BB%84%E7%BB%87%E5%92%8C%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/03/18/%E9%81%BF%E5%85%8D%E5%85%A8%E5%B1%80%E7%8A%B6%E6%80%81%E2%80%94%E2%80%94%E4%B8%8E%E4%B8%8D%E5%8F%97%E6%8E%A7%E5%88%B6%E7%9A%84%E5%A4%8D%E5%90%88%E7%BB%84%E4%BB%B6%E5%85%B1%E7%BD%AE/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&text=了解 useSyncExternalStore"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&is_video=false&description=了解 useSyncExternalStore"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=了解 useSyncExternalStore&body=Check out this article: https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&name=了解 useSyncExternalStore&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&t=了解 useSyncExternalStore"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">引用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E6%95%B0"><span class="toc-number">1.1.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="toc-number">1.2.</span> <span class="toc-text">返回值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E"><span class="toc-number">1.3.</span> <span class="toc-text">说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A2%E9%98%85%E5%A4%96%E9%83%A8%E5%AD%98%E5%82%A8"><span class="toc-number">2.1.</span> <span class="toc-text">订阅外部存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A2%E9%98%85%E6%B5%8F%E8%A7%88%E5%99%A8-API"><span class="toc-number">2.2.</span> <span class="toc-text">订阅浏览器 API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%AF%B9%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B8%B2%E6%9F%93%E7%9A%84%E6%94%AF%E6%8C%81"><span class="toc-number">2.3.</span> <span class="toc-text">添加对服务器渲染的支持</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5"><span class="toc-number">3.</span> <span class="toc-text">故障排查</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#I%E2%80%99m-getting-an-error-%E2%80%9CThe-result-of-getSnapshot-should-be-cached%E2%80%9D"><span class="toc-number">3.1.</span> <span class="toc-text">I’m getting an error: “The result of getSnapshot should be cached”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#My-subscribe-function-gets-called-after-every-re-render"><span class="toc-number">3.2.</span> <span class="toc-text">My subscribe function gets called after every re-render</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        了解 useSyncExternalStore
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">grafield</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-05-13T16:00:00.000Z" itemprop="datePublished">2023-05-14</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p><code>useSyncExternalStore</code> 是一个 React hook，可以让你订阅一个外部存储。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><code>useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?)</code></p>
+<p>调用组件顶层的 <code>useSyncExternalStore</code> 从外部数据存储读取值。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; useSyncExternalStore &#125; <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; todosStore &#125; <span class="keyword">from</span> <span class="string">&#x27;./todoStore.js&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">TodosApp</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> todos = <span class="title function_">useSyncExternalStore</span>(todosStore.<span class="property">subscribe</span>, todosStore.<span class="property">getSnapshot</span>);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它返回存储中数据的快照。您需要传递两个函数作为参数：</p>
+<ol>
+<li><code>subscribe</code> 函数订阅存储并返回一个取消订阅的函数。</li>
+<li><code>getSnapshot</code> 函数从存储区读取数据的快照。</li>
+</ol>
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><ul>
+<li><code>subscribe</code>: 一个接受单个 <code>callback</code> 参数并将其订阅到存储的函数。当存储更改时，它应该调用提供的 <code>callback</code>。这将导致组件重新渲染。<code>subscribe</code> 函数应返回一个清除订阅的函数。</li>
+<li><code>getSnapshot</code>: 一个函数，返回组件所需的存储数据的快照。只要存储没有改变，重复调用 <code>getSnapshot</code> 必须返回相同的值。如果存储更改并且返回值不同（通过 <code>Object.is</code> 比较），React 将重新渲染组件。</li>
+<li>optional <code>getServerSnapshot</code>: 一个返回存储中数据初始快照的函数。它仅在服务器渲染期间和客户端上对服务器呈现内容进行水合作用时使用。服务器快照必须在客户端和服务器之间相同，并且通常是序列化并从服务器传递到客户端。如果省略此参数，则在服务器上呈现组件将引发错误。</li>
+</ul>
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h3><p>您可以在渲染逻辑中使用当前快照的 <code>store</code>。</p>
+<h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><ul>
+<li>由 <code>getSnapshot</code> 返回的存储快照必须是不可变的。如果底层存储具有可变数据，则在数据更改时返回新的不可变快照。否则，返回缓存的最后一个快照。</li>
+<li>如果在重新渲染期间传递了不同的 <code>subscribe</code> 函数，React将使用新传递的 <code>subscribe</code> 函数重新订阅 <code>store</code>。您可以通过在组件外部声明 <code>subscribe</code> 来防止这种情况发生。</li>
+</ul>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="订阅外部存储"><a href="#订阅外部存储" class="headerlink" title="订阅外部存储"></a>订阅外部存储</h3><p>大多数 React 组件只会从它们的 <code>props</code>、<code>state</code> 和 <code>context</code> 读取数据。然而，有时一个组件需要从 React 之外的一些存储中读取一些随时间变化的数据。这包括：</p>
+<ul>
+<li>在 React 之外保存状态的第三方状态管理库。</li>
+<li>公开可变值和事件以订阅其更改的浏览器 API。</li>
+</ul>
+<p>在组件的顶层调用 <code>useSyncExternalStore</code> 以从外部数据存储中读取值。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; useSyncExternalStore &#125; <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; todosStore &#125; <span class="keyword">from</span> <span class="string">&#x27;./todoStore.js&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">TodosApp</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> todos = <span class="title function_">useSyncExternalStore</span>(todosStore.<span class="property">subscribe</span>, todosStore.<span class="property">getSnapshot</span>);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它返回存储中数据的 <code>snapshot</code>。您需要传递两个函数作为参数：</p>
+<ol>
+<li><code>subscribe</code> 函数应该订阅商店并返回一个取消订阅的函数。</li>
+<li><code>getSnapshot</code> 函数应该从存储中读取数据的快照。</li>
+</ol>
+<p>例如，在下面的沙箱中， <code>todosStore</code> 被实现为在 React 之外存储数据的外部存储。 <code>TodosApp</code> 组件使用 <code>useSyncExternalStore</code> Hook 连接到该外部存储。</p>
+<p><a target="_blank" rel="noopener" href="https://codesandbox.io/s/e3r3d3?file=/todoStore.js&utm_medium=sandpack">codesandbox</a></p>
+<h3 id="订阅浏览器-API"><a href="#订阅浏览器-API" class="headerlink" title="订阅浏览器 API"></a>订阅浏览器 API</h3><p>添加 <code>useSyncExternalStore</code> 的另一个原因是当您想要订阅浏览器公开的随时间变化的某些值时。例如，假设您希望您的组件显示网络连接是否处于活动状态。浏览器通过名为 <code>navigator.onLine</code> 的属性公开此信息。</p>
+<p>这个值可以在 React 不知情的情况下改变，所以你应该用 <code>useSyncExternalStore</code> 来阅读它。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; useSyncExternalStore &#125; <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">ChatIndicator</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> isOnline = <span class="title function_">useSyncExternalStore</span>(subscribe, getSnapshot);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要实现 <code>getSnapshot</code> 函数，请从浏览器 API 读取当前值：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getSnapshot</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> navigator.<span class="property">onLine</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，您需要实现 <code>subscribe</code> 函数。例如，当 <code>navigator.onLine</code> 发生变化时，浏览器会在 <code>window</code> 对象上触发 <code>online</code> 和 <code>offline</code> 事件。你需要订阅 <code>callback</code> 参数对应的事件，然后返回一个清理订阅的函数：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">subscribe</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">  <span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;online&#x27;</span>, callback);</span><br><span class="line">  <span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;offline&#x27;</span>, callback);</span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">window</span>.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;online&#x27;</span>, callback);</span><br><span class="line">    <span class="variable language_">window</span>.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;offline&#x27;</span>, callback);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在 React 知道如何从外部 <code>navigator.onLine</code> API 读取值以及如何订阅它的更改。断开您的设备与网络的连接并注意组件重新呈现以响应：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; useSyncExternalStore &#125; <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">function</span> <span class="title function_">ChatIndicator</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> isOnline = <span class="title function_">useSyncExternalStore</span>(subscribe, getSnapshot);</span><br><span class="line">  <span class="keyword">return</span> <span class="language-xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;isOnline ? &#x27;✅ Online&#x27; : &#x27;❌ Disconnected&#x27;&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getSnapshot</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> navigator.<span class="property">onLine</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">subscribe</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">  <span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;online&#x27;</span>, callback);</span><br><span class="line">  <span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;offline&#x27;</span>, callback);</span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">window</span>.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;online&#x27;</span>, callback);</span><br><span class="line">    <span class="variable language_">window</span>.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;offline&#x27;</span>, callback);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加对服务器渲染的支持"><a href="#添加对服务器渲染的支持" class="headerlink" title="添加对服务器渲染的支持"></a>添加对服务器渲染的支持</h3><p>如果您的 React 应用程序使用服务器渲染，您的 React 组件也会在浏览器环境之外运行以生成初始 HTML。这在连接到外部商店时带来了一些挑战：</p>
+<ul>
+<li>如果您连接到仅限浏览器的 API，它将无法工作，因为它不存在于服务器上。</li>
+<li>如果您连接到第三方数据存储，则需要其数据在服务器和客户端之间匹配。</li>
+</ul>
+<p>要解决这些问题，请将 <code>getServerSnapshot</code> 函数作为第三个参数传递给 <code>useSyncExternalStore</code> ：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; useSyncExternalStore &#125; <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">useOnlineStatus</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> isOnline = <span class="title function_">useSyncExternalStore</span>(subscribe, getSnapshot, getServerSnapshot);</span><br><span class="line">  <span class="keyword">return</span> isOnline;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getSnapshot</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> navigator.<span class="property">onLine</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getServerSnapshot</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// Always show &quot;Online&quot; for server-generated HTML</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">subscribe</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>getServerSnapshot</code> 功能类似于 <code>getSnapshot</code> ，但它只在两种情况下运行：</p>
+<ul>
+<li>它在生成 HTML 时在服务器上运行。</li>
+<li>它在 hydration 期间在客户端上运行，即当 React 获取服务器 HTML 并使其交互时。</li>
+</ul>
+<p>这使您可以提供初始快照值，该值将在应用程序变为交互式之前使用。如果服务器渲染没有有意义的初始值，则省略此参数以强制在客户端进行渲染。</p>
+<h2 id="故障排查"><a href="#故障排查" class="headerlink" title="故障排查"></a>故障排查</h2><h3 id="I’m-getting-an-error-“The-result-of-getSnapshot-should-be-cached”"><a href="#I’m-getting-an-error-“The-result-of-getSnapshot-should-be-cached”" class="headerlink" title="I’m getting an error: “The result of getSnapshot should be cached”"></a><code>I’m getting an error: “The result of getSnapshot should be cached”</code></h3><p>这个错误意味着你的 <code>getSnapshot</code> 函数每次被调用时都会返回一个新对象，例如：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getSnapshot</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// 🔴 Do not return always different objects from getSnapshot</span></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    <span class="attr">todos</span>: myStore.<span class="property">todos</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>您的 <code>getSnapshot</code> 对象应该只在实际发生更改时返回一个不同的对象。如果您的商店包含不可变数据，您可以直接返回该数据：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getSnapshot</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// ✅ You can return immutable data</span></span><br><span class="line">  <span class="keyword">return</span> myStore.<span class="property">todos</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果您的 <code>store</code> 数据是可变的，您的 <code>getSnapshot</code> 函数应该返回它的不可变快照。这意味着它确实需要创建新对象，但它不应该为每次调用都这样做。相反，它应该存储最后计算的快照，如果存储中的数据没有改变，则返回与上次相同的快照。如何确定可变数据是否已更改取决于您的可变存储。</p>
+<h3 id="My-subscribe-function-gets-called-after-every-re-render"><a href="#My-subscribe-function-gets-called-after-every-re-render" class="headerlink" title="My subscribe function gets called after every re-render"></a>My <code>subscribe</code> function gets called after every re-render</h3><p>这个 <code>subscribe</code> 函数是在组件内部定义的，所以它在每次重新渲染时都是不同的：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">ChatIndicator</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> isOnline = <span class="title function_">useSyncExternalStore</span>(subscribe, getSnapshot);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 🚩 Always a different function, so React will resubscribe on every re-render</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">subscribe</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果您在重新渲染之间传递不同的 <code>subscribe</code> 函数，React 将重新订阅您的 <code>store</code>。如果这会导致性能问题并且您希望避免重新订阅，请将 <code>subscribe</code> 函数移到外面：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">ChatIndicator</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> isOnline = <span class="title function_">useSyncExternalStore</span>(subscribe, getSnapshot);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ Always the same function, so React won&#x27;t need to resubscribe</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">subscribe</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>或者，将 <code>subscribe</code> 包装到 <code>useCallback</code> 中以仅在某些参数更改时重新订阅：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">ChatIndicator</span>(<span class="params">&#123; userId &#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> isOnline = <span class="title function_">useSyncExternalStore</span>(subscribe, getSnapshot);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// ✅ Same function as long as userId doesn&#x27;t change</span></span><br><span class="line">  <span class="keyword">const</span> subscribe = <span class="title function_">useCallback</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;, [userId]);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">引用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E6%95%B0"><span class="toc-number">1.1.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="toc-number">1.2.</span> <span class="toc-text">返回值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E"><span class="toc-number">1.3.</span> <span class="toc-text">说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A2%E9%98%85%E5%A4%96%E9%83%A8%E5%AD%98%E5%82%A8"><span class="toc-number">2.1.</span> <span class="toc-text">订阅外部存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A2%E9%98%85%E6%B5%8F%E8%A7%88%E5%99%A8-API"><span class="toc-number">2.2.</span> <span class="toc-text">订阅浏览器 API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%AF%B9%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B8%B2%E6%9F%93%E7%9A%84%E6%94%AF%E6%8C%81"><span class="toc-number">2.3.</span> <span class="toc-text">添加对服务器渲染的支持</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5"><span class="toc-number">3.</span> <span class="toc-text">故障排查</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#I%E2%80%99m-getting-an-error-%E2%80%9CThe-result-of-getSnapshot-should-be-cached%E2%80%9D"><span class="toc-number">3.1.</span> <span class="toc-text">I’m getting an error: “The result of getSnapshot should be cached”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#My-subscribe-function-gets-called-after-every-re-render"><span class="toc-number">3.2.</span> <span class="toc-text">My subscribe function gets called after every re-render</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&text=了解 useSyncExternalStore"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&is_video=false&description=了解 useSyncExternalStore"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=了解 useSyncExternalStore&body=Check out this article: https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&title=了解 useSyncExternalStore"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&name=了解 useSyncExternalStore&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://yaesakuras.github.io/2023/05/13/%E4%BA%86%E8%A7%A3%20useSyncExternalStore/&t=了解 useSyncExternalStore"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2023
+    grafield
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
